@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.gis',
     'GIS_RADAR.apps.GisRadarConfig'
 ]
 
@@ -75,9 +76,16 @@ WSGI_APPLICATION = 'gis_radar.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        # OJO AQUÍ: No uses 'django.db.backends.postgresql'
+        # Usamos el motor GIS
+        "ENGINE": "django.contrib.gis.db.backends.postgis",
+
+        "NAME": "gis_radar",  # El nombre de la DB
+        "USER": "postgres",
+        "PASSWORD": "1234",
+        "HOST": "localhost",
+        "PORT": "5432",  # El puerto estándar de Postgres
     }
 }
 
