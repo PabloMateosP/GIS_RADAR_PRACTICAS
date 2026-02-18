@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mapa de Radares DGT</title>
+    <style>
+        /* Importante: El mapa tiene que tener altura o no se verá */
+        #map { height: 100vh; width: 100%; }
+        body { margin: 0; }
+    </style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+</head>
+<body>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+
+    <script>
+        // Inicializar el mapa
+        var map = L.map('map').setView([40.416, -3.703], 6);
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        // Leer los datos de Django
+        var datosRadares = {{ radares_data|safe }};
+
+        // --- AQUÍ ESTÁ EL CAMBIO CLAVE ---
+
+        // A. Creamos un grupo de clusters (una "bolsa" inteligente)
+        var markers = L.markerClusterGroup();
+
+        var iconoRadar = L.icon({
+            iconUrl: 'https://cdn-icons-png.flaticon.com/512/75/75684.png', // Icono de radar (cámara)
+            iconSize: [32, 32], // Tamaño en pixeles
+            iconAnchor: [16, 32], // El punto que "toca" el mapa (la base del icono)
+            popupAnchor: [0, -32] // Donde sale el popup respecto al icono
+        });
+
+        // B. Creamos la capa de puntos GeoJSON con el icono nuevo
+        var geoJsonLayer = L.geoJSON(datosRadares, {
+
+            // Esta función convierte el punto matemático en un dibujo en el mapa
+            pointToLayer: function (feature, latlng) {
+                return L.marker(latlng, {icon: iconoRadar});
+            },
+
+            // Esta función añade el popup (lo que ya tenías)
+            onEachFeature: function (feature, layer) {
+                if (feature.properties && feature.properties.nombre) {
+                    // He puesto un poco de HTML para que se vea más bonito (Negrita y salto de línea)
+                    var contenido = "<div style='text-align:center'>" +
+                                    "📷 <b>RADAR FIJO</b><br>" +
+                                    feature.properties.nombre +
+                                    "</div>";
+                    layer.bindPopup(contenido);
+                }
+            }
+        });
+
+        // C. Metemos los puntos dentro de la "bolsa" de clusters
+        markers.addLayer(geoJsonLayer);
+
+        // D. Finalmente, añadimos la "bolsa" al mapa
+        map.addLayer(markers);
+
+    </script>
+</body>
+</html>

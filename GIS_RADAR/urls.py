@@ -1,7 +1,7 @@
 from django.urls import path
-
 from . import views
 
 urlpatterns = [
-    path("", views.index, name="index"),
+    # Al dejar las comillas vacías '', decimos que es la portada de la sección "Radar/"
+    path('', views.mapa_radares, name='mapa_radares'),
 ]
