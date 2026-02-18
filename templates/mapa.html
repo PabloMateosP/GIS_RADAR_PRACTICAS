@@ -16,6 +16,23 @@
 
     <div id="map"></div>
 
+    <button onclick="centrarEnMiPosicion()" style="
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000; /* Para que flote encima del mapa */
+        background: white;
+        border: 2px solid rgba(0,0,0,0.2);
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    ">
+        📍
+    </button>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
@@ -71,6 +88,38 @@
         // D. Finalmente, añadimos la "bolsa" al mapa
         map.addLayer(markers);
 
+        // Variable para guardar tu marcador y no crear mil si le das muchas veces
+        var miMarcador = null;
+
+        function centrarEnMiPosicion() {
+            // Pedimos al mapa que nos busque
+            map.locate({setView: true, maxZoom: 13});
+        }
+
+        // Cuando el mapa te encuentra, ejecuta esto:
+        map.on('locationfound', function(e) {
+            // Si ya había un marcador tuyo, lo quitamos para poner el nuevo
+            if (miMarcador) {
+                map.removeLayer(miMarcador);
+            }
+
+            // Creamos un círculo azul pulsante (simulando el de Google Maps)
+            miMarcador = L.circleMarker(e.latlng, {
+                radius: 10,
+                color: 'white',
+                weight: 3,
+                fillColor: '#2196F3', // Azul Google
+                fillOpacity: 1
+            }).addTo(map);
+
+            // Añadimos un radio de precisión (el círculo azul clarito alrededor)
+            L.circle(e.latlng, e.accuracy / 2).addTo(map);
+        });
+
+        // Si hay error (ej: no das permiso)
+        map.on('locationerror', function(e) {
+            alert("No he podido encontrarte: " + e.message);
+        });
     </script>
 </body>
 </html>
