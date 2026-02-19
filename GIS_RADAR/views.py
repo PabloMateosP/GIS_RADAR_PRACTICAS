@@ -2,7 +2,9 @@ from django.shortcuts import render
 from django.core.serializers import serialize
 from django.http import JsonResponse
 from django.core.management import call_command
+from django.views.decorators.csrf import csrf_exempt
 from .models import Radar
+import json
 
 def mapa_radares(request):
     # 1. Obtener todos los radares
@@ -28,3 +30,37 @@ def actualizar_radares(request):
     except Exception as e:
         # Si algo falla, devolvemos el error
         return JsonResponse({'status': 'error', 'mensaje': str(e)}, status=500)
+
+@csrf_exempt
+def editar_radar(request, radar_id):
+    if request.method == 'POST':
+        try:
+            # Leemos los datos que nos manda JavaScript
+            data = json.loads(request.body)
+
+            # Buscamos el radar en la base de datos
+            radar = Radar.objects.get(id=radar_id)
+
+            # Actualizamos los campos
+            radar.nombre = data.get('nombre', radar.nombre)
+            radar.velocidad = data.get('velocidad', radar.velocidad)
+
+            # Guardamos los cambios
+            radar.save()
+            return JsonResponse({'status': 'ok'})
+
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'mensaje': str(e)})
+
+
+@csrf_exempt
+def borrar_radar(request, radar_id):
+    if request.method == 'POST':
+        try:
+            # Buscamos el radar y lo eliminamos
+            radar = Radar.objects.get(id=radar_id)
+            radar.delete()
+            return JsonResponse({'status': 'ok'})
+
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'mensaje': str(e)})
