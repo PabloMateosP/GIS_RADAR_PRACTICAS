@@ -1,125 +1,40 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Mapa de Radares DGT</title>
-    <style>
-        /* Importante: El mapa tiene que tener altura o no se verá */
-        #map { height: 100vh; width: 100%; }
-        body { margin: 0; }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/estilo.css' %}">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
 </head>
 <body>
 
-    <div id="map"></div>
+    <div class="contenedor-principal">
+        <div id="sidebar">
+            <h3 style="margin-top: 0;">Lista de Radares</h3>
+            <div id="lista-radares">
+                </div>
+        </div>
 
-    <button onclick="centrarEnMiPosicion()" style="
-        position: absolute;
-        bottom: 20px;
-        right: 20px;
-        z-index: 1000; /* Para que flote encima del mapa */
-        background: white;
-        border: 2px solid rgba(0,0,0,0.2);
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        font-size: 24px;
-        cursor: pointer;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    ">
+        <div id="map"></div>
+    </div>
+
+    <button onclick="llamarActualizacion()" id="btn-actualizar">
+        Actualizar DGT
+    </button>
+
+    <button onclick="centrarEnMiPosicion()" id="btn-localizar">
         📍
     </button>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
     <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
-
     <script>
-        // Inicializar el mapa
-        var map = L.map('map').setView([40.416, -3.703], 6);
-
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; OpenStreetMap'
-        }).addTo(map);
-
-        // Leer los datos de Django
-        var datosRadares = {{ radares_data|safe }};
-
-        // --- AQUÍ ESTÁ EL CAMBIO CLAVE ---
-
-        // A. Creamos un grupo de clusters (una "bolsa" inteligente)
-        var markers = L.markerClusterGroup();
-
-        var iconoRadar = L.icon({
-            iconUrl: 'https://cdn-icons-png.flaticon.com/512/75/75684.png', // Icono de radar (cámara)
-            iconSize: [32, 32], // Tamaño en pixeles
-            iconAnchor: [16, 32], // El punto que "toca" el mapa (la base del icono)
-            popupAnchor: [0, -32] // Donde sale el popup respecto al icono
-        });
-
-        // B. Creamos la capa de puntos GeoJSON con el icono nuevo
-        var geoJsonLayer = L.geoJSON(datosRadares, {
-
-            // Esta función convierte el punto matemático en un dibujo en el mapa
-            pointToLayer: function (feature, latlng) {
-                return L.marker(latlng, {icon: iconoRadar});
-            },
-
-            // Esta función añade el popup (lo que ya tenías)
-            onEachFeature: function (feature, layer) {
-                if (feature.properties && feature.properties.nombre) {
-                    // He puesto un poco de HTML para que se vea más bonito (Negrita y salto de línea)
-                    var contenido = "<div style='text-align:center'>" +
-                                    "📷 <b>RADAR FIJO</b><br>" +
-                                    feature.properties.nombre +
-                                    "</div>";
-                    layer.bindPopup(contenido);
-                }
-            }
-        });
-
-        // C. Metemos los puntos dentro de la "bolsa" de clusters
-        markers.addLayer(geoJsonLayer);
-
-        // D. Finalmente, añadimos la "bolsa" al mapa
-        map.addLayer(markers);
-
-        // Variable para guardar tu marcador y no crear mil si le das muchas veces
-        var miMarcador = null;
-
-        function centrarEnMiPosicion() {
-            // Pedimos al mapa que nos busque
-            map.locate({setView: true, maxZoom: 13});
-        }
-
-        // Cuando el mapa te encuentra, ejecuta esto:
-        map.on('locationfound', function(e) {
-            // Si ya había un marcador tuyo, lo quitamos para poner el nuevo
-            if (miMarcador) {
-                map.removeLayer(miMarcador);
-            }
-
-            // Creamos un círculo azul pulsante (simulando el de Google Maps)
-            miMarcador = L.circleMarker(e.latlng, {
-                radius: 10,
-                color: 'white',
-                weight: 3,
-                fillColor: '#2196F3', // Azul Google
-                fillOpacity: 1
-            }).addTo(map);
-
-            // Añadimos un radio de precisión (el círculo azul clarito alrededor)
-            L.circle(e.latlng, e.accuracy / 2).addTo(map);
-        });
-
-        // Si hay error (ej: no das permiso)
-        map.on('locationerror', function(e) {
-            alert("No he podido encontrarte: " + e.message);
-        });
+        const datosRadares = {{ radares_data|safe }};
     </script>
+    <script src="{% static 'js/mapa.js' %}"></script>
+
 </body>
 </html>
