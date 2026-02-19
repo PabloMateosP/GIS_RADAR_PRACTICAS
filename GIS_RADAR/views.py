@@ -3,6 +3,7 @@ from django.core.serializers import serialize
 from django.http import JsonResponse
 from django.core.management import call_command
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.gis.geos import Point
 from .models import Radar
 import json
 
@@ -11,10 +12,8 @@ def mapa_radares(request):
     radares = Radar.objects.all()
 
     # 2. Convertirlos a GeoJSON
-    # El primer argumento es el formato ('geojson')
-    # El segundo son los datos
-    # geometry_field='ubicacion' le dice cuál es el campo del punto
-    radares_geojson = serialize('geojson', radares, geometry_field='ubicacion', fields=('nombre', 'velocidad'))
+    # Añadimos 'tipo' en los fields para que viaje al frontend
+    radares_geojson = serialize('geojson', radares, geometry_field='ubicacion', fields=('nombre', 'velocidad', 'tipo'))
 
     # 3. Enviarlos al HTML (contexto)
     return render(request, 'mapa.html', {'radares_data': radares_geojson})
@@ -52,7 +51,6 @@ def editar_radar(request, radar_id):
         except Exception as e:
             return JsonResponse({'status': 'error', 'mensaje': str(e)})
 
-
 @csrf_exempt
 def borrar_radar(request, radar_id):
     if request.method == 'POST':
@@ -60,6 +58,53 @@ def borrar_radar(request, radar_id):
             # Buscamos el radar y lo eliminamos
             radar = Radar.objects.get(id=radar_id)
             radar.delete()
+            return JsonResponse({'status': 'ok'})
+
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'mensaje': str(e)})
+
+@csrf_exempt
+def mover_radar(request, radar_id):
+    if request.method == 'POST':
+        try:
+            # Leemos las coordenadas que nos mandará JavaScript
+            data = json.loads(request.body)
+            nueva_lat = data.get('lat')
+            nueva_lng = data.get('lng')
+
+            # Buscamos el radar y le asignamos el nuevo punto espacial
+            radar = Radar.objects.get(id=radar_id)
+            radar.ubicacion = Point(nueva_lng, nueva_lat, srid=4326)  # Ojo: Point usa (Longitud, Latitud)
+            radar.save()
+
+            return JsonResponse({'status': 'ok'})
+
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'mensaje': str(e)})
+
+
+@csrf_exempt
+def crear_radar_movil(request):
+    if request.method == 'POST':
+        try:
+            # Leemos los datos enviados por Geoman/JavaScript
+            data = json.loads(request.body)
+            nombre = data.get('nombre', 'Zona de Control Móvil')
+            velocidad = data.get('velocidad', 0)
+            nueva_lat = data.get('lat')
+            nueva_lng = data.get('lng')
+
+            # Creamos el punto espacial
+            punto = Point(nueva_lng, nueva_lat, srid=4326)
+
+            # Guardamos en la base de datos especificando el tipo MOVIL
+            Radar.objects.create(
+                nombre=nombre,
+                velocidad=velocidad,
+                tipo='MOVIL',
+                ubicacion=punto
+            )
+
             return JsonResponse({'status': 'ok'})
 
         except Exception as e:
