@@ -1,0 +1,28 @@
+# Entornos Virtuales
+venv/
+.venv/
+env/
+
+# Caché de Python
+*.pyc
+__pycache__/
+
+# Archivos de configuración local y secretos
+.env
+local_settings.py
+
+# Bases de datos locales (por si alguna vez usas SQLite en pruebas)
+db.sqlite3
+*.sqlite3
+
+# Archivos de tu editor de código (PyCharm / VSCode)
+.idea/
+.vscode/
+
+# Archivos del sistema operativo (Mac/Windows)
+.DS_Store
+Thumbs.db
+
+# Archivos estáticos y multimedia en producción
+/static/
+/media/
