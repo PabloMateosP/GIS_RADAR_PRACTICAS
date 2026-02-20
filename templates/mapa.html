@@ -11,6 +11,12 @@
     <link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@latest/dist/leaflet-geoman.css"/>
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.6/dist/sweetalert2.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.6/dist/sweetalert2.all.min.js"></script>
+    <style>
+    /* Bloqueamos a SweetAlert para que no aplaste el mapa de Leaflet */
+    body.swal2-height-auto {
+        height: 100vh !important;
+    }
+</style>
 </head>
 <body>
 
