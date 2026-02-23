@@ -18,3 +18,6 @@ class Radar(models.Model):
 # Este archivo es el que se usa cuando ejecutamos el comando: python manage.py makemigrations
 # con el anterior comando creamos las instrucciones para el posterior comando: python manage.py migrate
 # con este comando final ya construimos mediante las sentencias necesarias en postGIS.
+
+# Estos comandos solo se deben ejecutar cuando modificamos la estructura de nuestra base de datos, tanto añadiendo
+# un nuevo campo como eliminando ...
