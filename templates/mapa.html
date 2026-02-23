@@ -21,13 +21,6 @@
 <body>
 
     <div class="contenedor-principal">
-        <div id="sidebar">
-            <h3 style="margin-top: 0;">Lista de Radares</h3>
-            <input type="text" id="buscador-radares" placeholder="Buscar por nombre...">
-            <div id="lista-radares">
-            </div>
-        </div>
-
         <div id="map"></div>
     </div>
 
@@ -42,8 +35,8 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
     <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@latest/dist/leaflet-geoman.js"></script>
-    <script>
-        const datosRadares = {{ radares_data|safe }};
+    <script> // Cogemos la infomación devuelta por el archivo views.py y la devolvemos al mapa.js
+        const datosRadares = {{ radares_data|safe }}; // Mediante el safe protegemos el formato para que Django no lo altere
     </script>
     <script src="{% static 'js/mapa.js' %}"></script>
 

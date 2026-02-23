@@ -30,6 +30,9 @@ def actualizar_radares(request):
         # Si algo falla, devolvemos el error
         return JsonResponse({'status': 'error', 'mensaje': str(e)}, status=500)
 
+# Para que podamos modificar la base de datos, necesitamos saltar el Token CSRF que no voy a implementar para
+# hacer más sencilla la app.
+# Para una app sería es de vital importancia ya un atacante podría modificar la base de datos
 @csrf_exempt
 def editar_radar(request, radar_id):
     if request.method == 'POST':
@@ -81,7 +84,6 @@ def mover_radar(request, radar_id):
 
         except Exception as e:
             return JsonResponse({'status': 'error', 'mensaje': str(e)})
-
 
 @csrf_exempt
 def crear_radar_movil(request):
