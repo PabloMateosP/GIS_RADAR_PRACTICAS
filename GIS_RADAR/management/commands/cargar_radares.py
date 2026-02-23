@@ -1,5 +1,5 @@
 import requests
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as ET # Importamos para leer los datos de la DGT en mejor formato
 from django.core.management.base import BaseCommand
 from django.contrib.gis.geos import Point
 from GIS_RADAR.models import Radar
@@ -11,19 +11,19 @@ class Command(BaseCommand):
         self.stdout.write("Sincronizando con DGT...")
 
         url = "https://infocar.dgt.es/datex2/dgt/PredefinedLocationsPublication/radares/content.xml"
-        response = requests.get(url)
+        response = requests.get(url) # Descargamos el archivo
 
         if response.status_code != 200:
             self.stdout.write(self.style.ERROR('Error al descargar'))
             return
 
-        root = ET.fromstring(response.content)
-        ns = {'d2': 'http://datex2.eu/schema/1_0/1_0'}
+        root = ET.fromstring(response.content) # Volvemos lo descargado en datos navegables a modo de árbol.
+        ns = {'d2': 'http://datex2.eu/schema/1_0/1_0'} # Etiqueta prefijada d2 para organizar información.
 
         nuevos = 0
         existentes = 0
 
-        for location in root.findall('.//d2:predefinedLocation', ns):
+        for location in root.findall('.//d2:predefinedLocation', ns): # Buscamos en el documento las etiquetas predefinedLocation
             try:
                 coords = location.find('.//d2:pointCoordinates', ns)
                 if coords is None:
@@ -31,7 +31,7 @@ class Command(BaseCommand):
 
                 lat = float(coords.find('d2:latitude', ns).text)
                 lon = float(coords.find('d2:longitude', ns).text)
-                punto = Point(lon, lat, srid=4326)
+                punto = Point(lon, lat, srid=4326) # Guardamos en un objeto Punto con el estandar de sistema de coordenadas GPS
 
                 # Comprobamos si ya tenemos un radar en ese punto exacto
                 if Radar.objects.filter(ubicacion=punto).exists():
