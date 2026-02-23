@@ -83,7 +83,7 @@ WSGI_APPLICATION = 'gis_radar.wsgi.application'
 
 DATABASES = {
     "default": {
-        # OJO AQUÍ: No uses 'django.db.backends.postgresql'
+        # OJO AQUÍ: No usar 'django.db.backends.postgresql'
         # Usamos el motor GIS
         "ENGINE": "django.contrib.gis.db.backends.postgis",
 
@@ -94,7 +94,6 @@ DATABASES = {
         "PORT": os.getenv('DB_PORT'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators

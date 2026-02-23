@@ -1,6 +1,6 @@
 from django.contrib.gis.db import models
 
-# EL CAMBIO ESTÁ AQUÍ: models.Model
+# Son los planos para los objetos de nuestra base de datos.
 class Radar(models.Model):
     TIPOS_RADAR = [
         ('FIJO', 'Radar Fijo'),
@@ -14,3 +14,7 @@ class Radar(models.Model):
 
     def __str__(self):
         return f"{self.nombre} ({self.tipo})"
+
+# Este archivo es el que se usa cuando ejecutamos el comando: python manage.py makemigrations
+# con el anterior comando creamos las instrucciones para el posterior comando: python manage.py migrate
+# con este comando final ya construimos mediante las sentencias necesarias en postGIS.
