@@ -7,6 +7,9 @@ from django.contrib.gis.geos import Point
 from .models import Radar
 import json
 
+from GIS_RADAR.services.radares_service import sincronizar_radares
+
+
 def mapa_radares(request):
     # 1. Obtener todos los radares
     radares = Radar.objects.all()
@@ -18,21 +21,26 @@ def mapa_radares(request):
     # 3. Enviarlos al HTML (contexto)
     return render(request, 'mapa.html', {'radares_data': radares_geojson})
 
+
 def actualizar_radares(request):
     try:
-        # Esto es exactamente igual que escribir "python manage.py cargar_radares" en la terminal
-        call_command('cargar_radares')
-
-        # Si va bien, devolvemos un mensaje de éxito en formato JSON
-        return JsonResponse({'status': 'ok', 'mensaje': 'Radares actualizados correctamente'})
+        resultado = sincronizar_radares()
+        print(resultado)
+        return JsonResponse({
+            'status': 'ok',
+            'mensaje': 'Radares actualizados correctamente',
+            'nuevos': resultado["nuevos"],
+            'existentes': resultado["existentes"],
+        })
     except Exception as e:
-        # Si algo falla, devolvemos el error
-        return JsonResponse({'status': 'error', 'mensaje': str(e)}, status=500)
+        return JsonResponse({
+            'status': 'error',
+            'mensaje': str(e)
+        }, status=500)
 
 # Para que podamos modificar la base de datos, necesitamos saltar el Token CSRF que no voy a implementar para
 # hacer más sencilla la app.
 # Para una app sería es de vital importancia ya un atacante podría modificar la base de datos
-@csrf_exempt
 def editar_radar(request, radar_id):
     if request.method == 'POST':
         try:
@@ -110,3 +118,7 @@ def crear_radar_movil(request):
 
         except Exception as e:
             return JsonResponse({'status': 'error', 'mensaje': str(e)})
+
+
+# TODO: Pasar la consulta de los radares a backend sin contexto.
+# TODO: Quitar los CSRF Exempt

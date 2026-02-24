@@ -21,3 +21,7 @@ class Radar(models.Model):
 
 # Estos comandos solo se deben ejecutar cuando modificamos la estructura de nuestra base de datos, tanto añadiendo
 # un nuevo campo como eliminando ...
+
+# TODO: MOCEL NUEVO FK A Radar (muiltas)
+
+# tt, matricula, velocidad, importe

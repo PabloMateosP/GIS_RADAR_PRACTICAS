@@ -16,7 +16,7 @@
     body.swal2-height-auto {
         height: 100vh !important;
     }
-</style>
+    </style>
 </head>
 <body>
 
@@ -28,15 +28,23 @@
         Actualizar DGT
     </button>
 
-    <button onclick="centrarEnMiPosicion()" id="btn-localizar">
+    <button  id="btn-localizar">
         📍
     </button>
+
+
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
     <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@latest/dist/leaflet-geoman.js"></script>
     <script> // Cogemos la infomación devuelta por el archivo views.py y la devolvemos al mapa.js
         const datosRadares = {{ radares_data|safe }}; // Mediante el safe protegemos el formato para que Django no lo altere
+        const csrf_token = "{{ csrf_token }}";
+        console.log(csrf_token)
+        document.querySelector('#btn-localizar').addEventListener('click', () => {
+            console.log("CENTRANDO MI POSICION");
+            centrarEnMiPosicion();
+        });
     </script>
     <script src="{% static 'js/mapa.js' %}"></script>
 
