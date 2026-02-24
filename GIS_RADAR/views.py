@@ -18,7 +18,6 @@ def mapa_radares(request):
     # 3. Enviarlos al HTML (contexto)
     return render(request, 'mapa.html', {'radares_data': radares_geojson})
 
-
 def actualizar_radares(request):
     try:
         # Esto es exactamente igual que escribir "python manage.py cargar_radares" en la terminal
